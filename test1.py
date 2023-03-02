@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 
 print('finished importing')
 search_query = input('What type of profile do you want to scrape?')
-
+number_of_pages = int(input('how many pages do you want to scrape'))
 # Access linkedin and login 
 driver = webdriver.Edge()
 url = 'https://www.linkedin.com/login'
@@ -55,32 +55,34 @@ search_field.send_keys(search_query)
 time.sleep(1)
 
 
+
+
+
 # Search
 search_field.send_keys(Keys.ENTER)
-
-time.sleep(5)
-
-elems = driver.find_elements(By.XPATH,"//a[@href]")
-for elem in elems:
-    print(elem.get_attribute("href"))
-if elem not in elems :
-    elems.append(elem)
-print(elems)    
-try:
-    #choose_people = driver.find_element(By.XPATH,'//*[@id="search-reusables__filters-bar"]/ul/li[5]/button')
-    #choose_people.click()
-
-    print("it worked")
-    os.system('pause')
-
-except:
-    print("it didnt work")
-    time.sleep(39)
-
-
-print(type(elems))
+def extract_links():
+    time.sleep(5)
+    links = []
+    elems = driver.find_elements(By.XPATH,"//a[@href]")
+    for elem in elems:
+        if 'https://www.linkedin.com/in/' in elem.get_attribute("href"):
+            links.append(elem.get_attribute("href"))
+    non_duplicate_links=set(links)
+    return non_duplicate_links
+def go_to_next_page():
+    driver.execute_script('window.scrollTo(0, document.body.scrollHeight);') #scroll to the end of the page
+    time.sleep(2)
+    next_button = driver.find_element(By.CLASS_NAME,"artdeco-pagination__button--next")
+    next_button.click()
+    time.sleep(1)
 
 
 
+global_links=[]
 
-
+for i in range(number_of_pages):
+    global_links.extend(extract_links())
+    time.sleep(4)
+    go_to_next_page()
+for i in global_links:
+    print(i)
