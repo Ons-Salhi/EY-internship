@@ -1,15 +1,16 @@
 # importing libraries and packages for this project
-
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 import time
 import os
-from bs4 import BeautifulSoup
+import urllib
+import collections
+collections.Callable = collections.abc.Callable
 
 print('finished importing')
 search_query = input('What type of profile do you want to scrape?')
-number_of_pages = int(input('how many pages do you want to scrape'))
+number_of_pages = int(input('How many pages do you want to scrape?'))
 # Access linkedin and login 
 driver = webdriver.Edge()
 url = 'https://www.linkedin.com/login'
@@ -41,48 +42,31 @@ login_field.click()
 print('Successfully logged in!')
 time.sleep(2)
 
-# Locate the search bar element
-try:
-    search_button_mini = driver.find_element(By.XPATH,'//*[@id="global-nav-search"]/div/button')
-    search_button_mini.click()
-    time.sleep(1.5)
-except:
-    time.sleep(0.1)
-
-# Input the search query to the search bar
-search_field = driver.find_element(By.XPATH,'//*[@id="global-nav-typeahead"]/input')
-search_field.send_keys(search_query)
-time.sleep(1)
 
 
+profile_to_find = urllib.parse.quote(search_query)
+url = 'https://www.linkedin.com/search/results/people/?keywords='+profile_to_find+'&origin=SWITCH_SEARCH_VERTICAL&page='
+links=[]
 
 
-
-# Search
-search_field.send_keys(Keys.ENTER)
-def extract_links():
-    time.sleep(5)
-    links = []
-    elems = driver.find_elements(By.XPATH,"//a[@href]")
-    for elem in elems:
-        if 'https://www.linkedin.com/in/' in elem.get_attribute("href"):
-            links.append(elem.get_attribute("href"))
-    non_duplicate_links=set(links)
-    return non_duplicate_links
-def go_to_next_page():
-    driver.execute_script('window.scrollTo(0, document.body.scrollHeight);') #scroll to the end of the page
-    time.sleep(2)
-    next_button = driver.find_element(By.CLASS_NAME,"artdeco-pagination__button--next")
-    next_button.click()
+def extract_links(i):
+    url = 'https://www.linkedin.com/search/results/people/?keywords='+profile_to_find+'&origin=SWITCH_SEARCH_VERTICAL&page='+str(i)
+    driver.get(url)
     time.sleep(1)
-
-
-
-global_links=[]
-
-for i in range(number_of_pages):
-    global_links.extend(extract_links())
+    profiles = driver.find_elements(By.CLASS_NAME,'app-aware-link')
+    profile_links = []
+    for profile in profiles:
+        profile_links.append(profile.get_attribute("href"))
+    for link in profile_links:
+        links.append(link)
+for i in range(1,number_of_pages+1):
     time.sleep(4)
-    go_to_next_page()
-for i in global_links:
-    print(i)
+    extract_links(i)
+    print('going to page '+str(i))
+l=set(links)
+
+file = open(search_query+'.txt','w')
+for item in l:
+    if ('www.linkedin.com/in/' in item):
+	    file.write(item+"\n")
+file.close()
