@@ -9,8 +9,7 @@ import collections
 collections.Callable = collections.abc.Callable
 
 print('finished importing')
-search_query = input('What type of profile do you want to scrape?')
-number_of_pages = int(input('How many pages do you want to scrape?'))
+
 # Access linkedin and login 
 driver = webdriver.Edge()
 url = 'https://www.linkedin.com/login'
@@ -44,37 +43,14 @@ time.sleep(2)
 
 
 
-profile_to_find = urllib.parse.quote(search_query)
-url = 'https://www.linkedin.com/search/results/people/?keywords='+profile_to_find+'&origin=SWITCH_SEARCH_VERTICAL&page='
-links=[]
+# Open the file containing links
+from parsel import Selector
 
 
-def extract_links(i):
-    url = 'https://www.linkedin.com/search/results/people/?keywords='+profile_to_find+'&origin=SWITCH_SEARCH_VERTICAL&page='+str(i)
-    driver.get(url)
-    time.sleep(1)
-    profiles = driver.find_elements(By.CLASS_NAME,'app-aware-link')
-    profile_links = []
-    for profile in profiles:
-        profile_links.append(profile.get_attribute("href"))
-    for link in profile_links:
-        links.append(link)
-for i in range(1,number_of_pages+1):
-    time.sleep(4)
-    extract_links(i)
-    print('going to page '+str(i))
-l=set(links)
-print(links)
-
-file = open(search_query+'.txt','w')
-for item in l:
-    if ('www.linkedin.com/in/' in item):
-	    file.write(item+"\n")
-file.close()
-
-# Task 3: Scrape the data of 1 LinkedIn profile & put it in a .CSV file
-
-f = open('items.txt')
-print(f.read())
-page_source = BeautifulSoup(driver.page_source, "html.parser")
-print(page_source)
+with open('items.txt', 'r') as f:
+    # Read the first line in the file
+    link = f.readline().strip()
+driver.get(link)
+sel = Selector(text=driver.page_source)
+name = sel.xpath('//h1/text()')
+print(name)
