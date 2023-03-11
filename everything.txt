@@ -1,4 +1,0 @@
-Name,Location,Title,About,Featured,Experience,Education,Licenses and Certifications,Skills and Endorsements,Accomplishments,Recommendations,Interests
-Eya Ghribi,"      Ariana, Ariana, Tunisia",      Data science engineering student,no information,no information,no information,no information,no information,no information,no information,no information,no information
-Name,Location,Title,About,Featured,Experience,Education,Licenses and Certifications,Skills and Endorsements,Accomplishments,Recommendations,Interests
-Enoch Lee,"      Berkeley, California, United States",      Data Science @UC Berkeley,no information,no information,no information,no information,no information,no information,no information,no information,no information
