@@ -72,58 +72,61 @@ for item in l:
 	    file.write(item+"\n")
 file.close()
 
+
+
 with open('scraped.txt','w',encoding='utf-8') as t:
 
     with open(search_query+'.txt', 'r',encoding='utf-8') as f:
         # Read the first line in the file
         link = f.readlines()
     for i in link:
-       
-        driver.get(i)
-        time.sleep(5)
-        name = driver.find_element(By.XPATH, '//h1[@class="text-heading-xlarge inline t-24 v-align-middle break-words"]')
         try:
-            for i in name:
-                t.write(i.get_attribute('innerHTML'))
-        except:
-            t.write(name.get_attribute('innerHTML'))
+            driver.get(i)
+            time.sleep(5)
+            name = driver.find_element(By.XPATH, '//h1[@class="text-heading-xlarge inline t-24 v-align-middle break-words"]')
+            try:
+                for i in name:
+                    t.write(i.get_attribute('innerHTML'))
+            except:
+                t.write(name.get_attribute('innerHTML'))
 
-        time.sleep(2)
+            time.sleep(2)
 
-        location = driver.find_elements(By.XPATH, '//span[@class="text-body-small inline t-black--light break-words"]')
-        try:
-            for i in location:
-                t.write(i.get_attribute('innerHTML'))
-        except:
-            t.write(location.get_attribute('innerHTML'))   
-
-        time.sleep(1)
-
-        title = driver.find_elements(By.XPATH, '//div[@class="text-body-medium break-words"]')
-        try:
-            for i in title:
-                t.write(i.get_attribute('innerHTML'))
-        except:
-            t.write(title.get_attribute('innerHTML'))
+            location = driver.find_elements(By.XPATH, '//span[@class="text-body-small inline t-black--light break-words"]')
+            try:
+                for i in location:
+                    t.write(i.get_attribute('innerHTML'))
+            except:
+                t.write(location.get_attribute('innerHTML'))   
 
             time.sleep(1)
 
-        experience_info = driver.find_elements(By.XPATH, '//section[@class="artdeco-card ember-view relative break-words pb3 mt2 "]')
-        try:
-            for i in experience_info:
-                t.write(i.text)
-                t.write('\n#######\n')
+            title = driver.find_elements(By.XPATH, '//div[@class="text-body-medium break-words"]')
+            try:
+                for i in title:
+                    t.write(i.get_attribute('innerHTML'))
+            except:
+                t.write(title.get_attribute('innerHTML'))
+
+                time.sleep(3)
+
+            experience_info = driver.find_elements(By.XPATH,'/html/body/div[5]/div[3]/div/div/div[2]/div/div/main/section[*]')
+            try:
+                for i in experience_info:
+                    t.write(i.text)
+                    t.write('\n#######\n')
+            except:
+                t.write(experience_info.get_attribute('outerHTML'))  
+                
+            t.write('\n__________________________________________\n')
         except:
-            t.write(experience_info.get_attribute('outerHTML'))  
-            
-        t.write('\n__________________________________________\n') 
+            continue
 
 import csv
 
 # Define the headers for the CSV
 headers = ['Name', 'Location', 'Title', 'About', 'Featured', 'Experience', 'Education',
-           'Licenses & certifications', 'Skills', 'Accomplishments',
-           'Recommendations', 'Interests']
+           'Licenses & certifications', 'Skills', 'Recommendations', 'Interests']
 
 # Open the text file with utf-8 encoding
 with open('scraped.txt', 'r', encoding='utf-8') as file:
@@ -142,15 +145,14 @@ with open(search_query+'.csv', mode='w', encoding='utf-8', newline='') as output
             'Name': '',
             'Location': '',
             'Title': '',
-            'About': 'no content',
-            'Featured': 'no content',
-            'Experience': 'no content',
-            'Education': 'no content',
-            'Licenses & certifications': 'no content',
-            'Skills': 'no content',
-            'Accomplishments': 'no content',
-            'Recommendations': 'no content',
-            'Interests': 'no content'
+            'About': '',
+            'Featured': '',
+            'Experience': '',
+            'Education': '',
+            'Licenses & certifications': '',
+            'Skills': '',
+            'Recommendations': '',
+            'Interests': ''
         }
 
         lines = i.split('\n')
@@ -162,11 +164,12 @@ with open(search_query+'.csv', mode='w', encoding='utf-8', newline='') as output
         for section in sections:
             section_name, section_content = section.split('\n', 1)
             section_variable_content = section_content.strip()
+            unique_content = '\n'.join(set(section_variable_content.splitlines()))
             section_variable_name = section_variable_content.split('\n')[0]
 
             # If the section variable name matches one of the headers, add its content to the row_data
             if section_variable_name in headers:
-                row_data[section_variable_name] = section_variable_content
+                row_data[section_variable_name] = unique_content
 
         # Write the row data to the CSV
         writer.writerow([row_data[header] for header in headers])
