@@ -7,6 +7,7 @@ import os
 import urllib
 import collections
 collections.Callable = collections.abc.Callable
+import pandas as pd
 
 print('finished importing')
 search_query = input('What type of profile do you want to scrape?')
@@ -66,7 +67,7 @@ for i in range(1,number_of_pages+1):
 l=set(links)
 print(links)
 
-file = open(search_query+'.txt','w')
+file = open(search_query+'.txt','w',encoding='utf-8')
 for item in l:
     if ('www.linkedin.com/in/' in item):
 	    file.write(item+"\n")
@@ -173,3 +174,7 @@ with open(search_query+'.csv', mode='w', encoding='utf-8', newline='') as output
 
         # Write the row data to the CSV
         writer.writerow([row_data[header] for header in headers])
+        
+
+df = pd.DataFrame(pd.read_csv('./cyber security.csv'))
+df.to_excel('cyber security.xlsx')
