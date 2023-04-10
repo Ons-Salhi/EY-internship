@@ -176,5 +176,5 @@ with open(search_query+'.csv', mode='w', encoding='utf-8', newline='') as output
         writer.writerow([row_data[header] for header in headers])
         
 
-df = pd.DataFrame(pd.read_csv('./Designer.csv'))
-df.to_excel('Designer.xlsx')
+df = pd.DataFrame(pd.read_csv('./IT services.csv'))
+df.to_excel('IT services.xlsx')
